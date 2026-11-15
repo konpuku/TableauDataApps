@@ -1,5 +1,5 @@
 // ============================================================================
-// charts.js — 5 つの手口(描き方は 7 種類)それぞれについて、「誤解を招く版」と「正直な版」を SVG で描く。
+// charts.js — 記事の 5 パターンと追加の 5 つ(描き方は 12 種類)それぞれについて、「誤解を招く版」と「正直な版」を SVG で描く。
 //
 //   var out = Charts.render(kind, { data, params, deceptive, style, title, t });
 //   out.svg      … 描いた <svg>
@@ -412,13 +412,187 @@
     } };
   }
 
-  var RENDERERS = { dual: dual, truncate: truncate, interval: interval, ratio: ratio, bars3d: bars3d, pie3d: pie3d, category: category };
+  // ==== ここから追加の手口(記事の 5 パターン以外) ============================
+
+  /** 折れ線 1 本の共通描画。yFrom..yTo の範囲に描き、invert なら上下を逆にする。 */
+  function simpleLine(p, o, items, yFrom, yTo, unit, invert) {
+    var n = items.length;
+    var xAt = function (i) { return p.x + 10 + (n === 1 ? 0.5 : i / (n - 1)) * (p.w - 20); };
+    var scale = function (v) {
+      var r = (v - yFrom) / (yTo - yFrom || 1);
+      return invert ? p.y + r * p.h : p.y + p.h - r * p.h;
+    };
+    yAxis(p, o, scale, ticks(yFrom, yTo, 5), 'left', unit);
+    baseline(p, o);
+    var every = Math.ceil(n / 8);
+    items.forEach(function (item, i) { if (i % every === 0 || i === n - 1 && n <= 8) xLabel(p, o, xAt(i), item.label); });
+    return { xAt: xAt, scale: scale, draw: function () {
+      line(p, o, items.map(function (item, i) { return [xAt(i), scale(item.value)]; }), o.style.accent);
+    } };
+  }
+
+  // ---- 追加 1: 期間の切り取り -------------------------------------------------
+  function cherry(o) {
+    var items = o.data.items, s = o.style, n = items.length;
+    var win = Math.max(2, Math.min(n, o.params.window));
+    var shown = o.deceptive ? items.slice(n - win) : items;
+    var p = frame(o);
+    var values = shown.map(function (i) { return i.value; });
+    var lo = Math.min.apply(null, values), hi = Math.max.apply(null, values);
+    // 切り取った版は、見せたい上昇が目立つように縦軸もその範囲に寄せる
+    var from = o.deceptive ? lo - (hi - lo) * 0.15 : 0;
+    var to = o.deceptive ? hi + (hi - lo) * 0.15 : niceMax(hi);
+    var chart = simpleLine(p, o, shown, from, to, o.t('cherry_unit'));
+    if (!o.deceptive) {
+      var x0 = chart.xAt(n - win), x1 = chart.xAt(n - 1);
+      p.svg.appendChild(el('rect', { x: x0 - 6, y: p.y, width: x1 - x0 + 12, height: p.h, fill: s.accent, 'fill-opacity': 0.12 }));
+    }
+    chart.draw();
+    var first = items[n - win].value, last = items[n - 1].value, start = items[0].value;
+    var signed = function (r) { return (r >= 0 ? '+' : '') + fmt(r * 100, 0); };
+    return { svg: p.svg, measure: {
+      n: win, total: n, window: signed(last / (first || 1) - 1), whole: signed(last / (start || 1) - 1),
+    } };
+  }
+
+  // ---- 追加 2: 絵グラフの面積水増し -------------------------------------------
+  // 値に合わせて「直径」を伸ばすと、面積は値の 2 乗で増える。
+  function picto(o) {
+    var items = o.data.items, s = o.style, n = items.length;
+    var max = Math.max.apply(null, items.map(function (i) { return i.value; })) || 1;
+    if (!o.deceptive) {
+      var q = frame(o);
+      var top = niceMax(max);
+      var scale = function (v) { return q.y + q.h - (v / top) * q.h; };
+      yAxis(q, o, scale, ticks(0, top, 5), 'left', o.t('picto_unit'));
+      baseline(q, o);
+      columns(q, o, items.map(function (item, i) {
+        return { label: item.label, value: item.value, color: i === n - 1 ? s.accent : s.main, opacity: i === n - 1 ? 1 : 0.75 };
+      }), scale);
+      return { svg: q.svg, measure: {} };
+    }
+    var p = frame(o, { left: 24, right: 24, bottom: 46 });
+    var both = o.params.both;
+    var maxR = Math.min(p.h / 2 - 4, p.w / (n * 2) - 6);
+    var slot = p.w / n, base = p.y + p.h;
+    items.forEach(function (item, i) {
+      var ratio = item.value / max;
+      var ry = maxR * ratio, rx = both ? ry : maxR * 0.42;   // both: 幅も一緒に拡大
+      var cx = p.x + slot * i + slot / 2, color = i === n - 1 ? s.accent : s.main;
+      p.svg.appendChild(el('path', {
+        fill: color, 'fill-opacity': i === n - 1 ? 1 : 0.75,
+        d: 'M' + (cx - rx) + ',' + (base - ry) + 'a' + rx + ',' + ry + ' 0 1 0 ' + (rx * 2) + ',0a' + rx + ',' + ry + ' 0 1 0 ' + (-rx * 2) + ',0Z',
+      }));
+      p.svg.appendChild(el('text', {
+        x: cx, y: base - ry + Math.max(5, ry * 0.2), 'text-anchor': 'middle', fill: '#fff', 'font-weight': 700,
+        'font-size': Math.max(10, Math.min(rx, ry) * 0.6), text: '¥',
+      }));
+      p.svg.appendChild(el('text', {
+        x: cx, y: base - ry * 2 - 6, 'text-anchor': 'middle', fill: s.ink, 'font-size': p.tick + 1, 'font-weight': 600, text: fmt(item.value),
+      }));
+      xLabel(p, o, cx, item.label);
+    });
+    baseline(p, o);
+    var actual = items[n - 1].value / (items[0].value || 1);
+    return { svg: p.svg, measure: {
+      a: items[n - 1].label, b: items[0].label, actual: fmt(actual, 2), area: fmt(both ? actual * actual : actual, 2),
+    } };
+  }
+
+  // ---- 追加 3: 累積グラフ -----------------------------------------------------
+  function cumulative(o) {
+    var items = o.data.items, s = o.style, n = items.length;
+    var p = frame(o);
+    var asTotal = o.deceptive && o.params.cumulative;
+    var running = 0;
+    var series = items.map(function (item) { running += item.value; return { label: item.label, value: asTotal ? running : item.value }; });
+    var top = niceMax(Math.max.apply(null, series.map(function (i) { return i.value; })));
+    if (asTotal) {
+      simpleLine(p, o, series, 0, top, o.t('cumulative_unitTotal')).draw();
+    } else {
+      var scale = function (v) { return p.y + p.h - (v / top) * p.h; };
+      yAxis(p, o, scale, ticks(0, top, 5), 'left', o.t('cumulative_unit'));
+      baseline(p, o);
+      var slot = p.w / n, bw = Math.min(24, slot * 0.6);
+      series.forEach(function (item, i) {
+        var y = scale(item.value), x = p.x + i * slot + (slot - bw) / 2, h = p.y + p.h - y, r = Math.min(4, h);
+        p.svg.appendChild(el('path', {
+          fill: s.main, 'fill-opacity': 0.85,
+          d: 'M' + x + ',' + (y + h) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y + 'H' + (x + bw - r) +
+            'Q' + (x + bw) + ',' + y + ' ' + (x + bw) + ',' + (y + r) + 'V' + (y + h) + 'Z',
+        }));
+        if (i === 0 || i === n - 1) {
+          p.svg.appendChild(el('text', { x: x + bw / 2, y: y - 6, 'text-anchor': 'middle', fill: s.ink, 'font-size': p.tick + 1, 'font-weight': 600, text: fmt(item.value) }));
+        }
+        if (i % Math.ceil(n / 8) === 0) xLabel(p, o, x + bw / 2, item.label);
+      });
+    }
+    var first = items[0].value, last = items[n - 1].value;
+    return { svg: p.svg, measure: {
+      total: fmt(running), first: fmt(first), last: fmt(last), pct: fmt(Math.abs(last / (first || 1) - 1) * 100, 0),
+    } };
+  }
+
+  // ---- 追加 4: 合計が 100% にならない円グラフ ---------------------------------
+  // 複数回答の結果は足すと 100% を超える。円グラフにすると「全体の内訳」に見えてしまう。
+  function multi(o) {
+    var items = o.data.items, s = o.style, n = items.length;
+    var sum = items.reduce(function (a, b) { return a + b.value; }, 0) || 1;
+    if (!o.deceptive) {
+      var q = frame(o);
+      var top = Math.max(100, niceMax(Math.max.apply(null, items.map(function (i) { return i.value; }))));
+      var scale = function (v) { return q.y + q.h - (v / top) * q.h; };
+      yAxis(q, o, scale, ticks(0, top, 5), 'left', o.t('multi_unit'));
+      baseline(q, o);
+      columns(q, o, items.map(function (item, i) {
+        return { label: item.label, value: item.value, color: i === 0 ? s.accent : s.main, opacity: i === 0 ? 1 : 0.75 };
+      }), scale, '%');
+      return { svg: q.svg, measure: {} };
+    }
+    var p = frame(o, { left: 20, right: 20, bottom: 24 });
+    var cx = W / 2, cy = p.y + p.h / 2, R = Math.min(p.w / 2 - 80, p.h / 2 - 4);
+    var at = function (a, r) { return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+    var a0 = -Math.PI / 2;
+    items.forEach(function (item, i) {
+      var a1 = a0 + (item.value / sum) * TAU, mid = (a0 + a1) / 2, cos = Math.cos(mid);
+      p.svg.appendChild(el('path', {
+        d: 'M' + cx + ',' + cy + 'L' + at(a0, R) + 'A' + R + ',' + R + ' 0 ' + (a1 - a0 > Math.PI ? 1 : 0) + ' 1 ' + at(a1, R) + 'Z',
+        fill: i === 0 ? s.accent : s.main, 'fill-opacity': i === 0 ? 1 : Math.max(0.25, 0.9 - (i - 1) * 0.2),
+        stroke: s.bg, 'stroke-width': 2,
+      }));
+      var pos = at(mid, R + 12);
+      p.svg.appendChild(el('text', {
+        x: pos[0], y: pos[1] + p.tick * 0.35, 'text-anchor': Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end',
+        fill: s.ink, 'font-size': p.tick + 1, 'font-weight': i === 0 ? 700 : 400, text: item.label + ' ' + fmt(item.value, 1) + '%',
+      }));
+      a0 = a1;
+    });
+    return { svg: p.svg, measure: {
+      sum: fmt(sum, 0), a: items[0].label, actual: fmt(items[0].value, 0), drawn: fmt((items[0].value / sum) * 100, 0),
+    } };
+  }
+
+  // ---- 追加 5: 軸の反転 -------------------------------------------------------
+  function inverted(o) {
+    var items = o.data.items, n = items.length;
+    var p = frame(o);
+    var top = niceMax(Math.max.apply(null, items.map(function (i) { return i.value; })));
+    simpleLine(p, o, items, 0, top, o.t('inverted_unit'), o.deceptive && o.params.invert).draw();
+    var first = items[0].value, last = items[n - 1].value;
+    return { svg: p.svg, measure: { first: fmt(first), last: fmt(last), pct: fmt((last / (first || 1) - 1) * 100, 0) } };
+  }
+
+  var RENDERERS = { dual: dual, truncate: truncate, interval: interval, ratio: ratio, bars3d: bars3d, pie3d: pie3d, category: category,
+    cherry: cherry, picto: picto, cumulative: cumulative, multi: multi, inverted: inverted };
 
   window.Charts = {
     // 画面に並べる 5 つの手口。手口 3 と 4 は記事の例に合わせて 2 種類の描き方(variants)を持つ。
     ORDER: ['dual', 'truncate', 'interval', 'threeD', 'category'],
     VARIANTS: { interval: ['ratio', 'interval'], threeD: ['bars3d', 'pie3d'] },
-    DATASETS: ['dual', 'truncate', 'interval', 'ratio', 'bars3d', 'pie3d', 'category'],
+    // 記事には無い、このアプリで追加した手口。
+    EXTRA: ['cherry', 'picto', 'cumulative', 'multi', 'inverted'],
+    DATASETS: ['dual', 'truncate', 'interval', 'ratio', 'bars3d', 'pie3d', 'category',
+      'cherry', 'picto', 'cumulative', 'multi', 'inverted'],
     render: function (kind, options) { return RENDERERS[kind](options); },
   };
 })();

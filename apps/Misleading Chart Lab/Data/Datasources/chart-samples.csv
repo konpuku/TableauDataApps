@@ -40,3 +40,53 @@ category,購買者数,Buyers,30代,30s,30,59
 category,購買者数,Buyers,40代,40s,40,73
 category,購買者数,Buyers,50代,50s,50,124
 category,購買者数,Buyers,60代,60s,60,102
+cherry,株価,Share price,23/1,23/1,1,100
+cherry,株価,Share price,23/2,23/2,2,97
+cherry,株価,Share price,23/3,23/3,3,95
+cherry,株価,Share price,23/4,23/4,4,90
+cherry,株価,Share price,23/5,23/5,5,88
+cherry,株価,Share price,23/6,23/6,6,84
+cherry,株価,Share price,23/7,23/7,7,81
+cherry,株価,Share price,23/8,23/8,8,77
+cherry,株価,Share price,23/9,23/9,9,74
+cherry,株価,Share price,23/10,23/10,10,72
+cherry,株価,Share price,23/11,23/11,11,69
+cherry,株価,Share price,23/12,23/12,12,66
+cherry,株価,Share price,24/1,24/1,13,64
+cherry,株価,Share price,24/2,24/2,14,62
+cherry,株価,Share price,24/3,24/3,15,61
+cherry,株価,Share price,24/4,24/4,16,60
+cherry,株価,Share price,24/5,24/5,17,60
+cherry,株価,Share price,24/6,24/6,18,59
+cherry,株価,Share price,24/7,24/7,19,58
+cherry,株価,Share price,24/8,24/8,20,60
+cherry,株価,Share price,24/9,24/9,21,63
+cherry,株価,Share price,24/10,24/10,22,66
+cherry,株価,Share price,24/11,24/11,23,70
+cherry,株価,Share price,24/12,24/12,24,74
+picto,売上,Revenue,2022,2022,2022,100
+picto,売上,Revenue,2023,2023,2023,150
+picto,売上,Revenue,2024,2024,2024,200
+cumulative,新規会員,New members,1月,Jan,1,120
+cumulative,新規会員,New members,2月,Feb,2,115
+cumulative,新規会員,New members,3月,Mar,3,108
+cumulative,新規会員,New members,4月,Apr,4,100
+cumulative,新規会員,New members,5月,May,5,92
+cumulative,新規会員,New members,6月,Jun,6,85
+cumulative,新規会員,New members,7月,Jul,7,76
+cumulative,新規会員,New members,8月,Aug,8,70
+cumulative,新規会員,New members,9月,Sep,9,61
+cumulative,新規会員,New members,10月,Oct,10,55
+cumulative,新規会員,New members,11月,Nov,11,48
+cumulative,新規会員,New members,12月,Dec,12,40
+multi,回答,Responses,価格,Price,1,62
+multi,回答,Responses,品質,Quality,2,55
+multi,回答,Responses,デザイン,Design,3,41
+multi,回答,Responses,サポート,Support,4,33
+multi,回答,Responses,ブランド,Brand,5,24
+inverted,苦情件数,Complaints,2019,2019,2019,120
+inverted,苦情件数,Complaints,2020,2020,2020,135
+inverted,苦情件数,Complaints,2021,2021,2021,160
+inverted,苦情件数,Complaints,2022,2022,2022,210
+inverted,苦情件数,Complaints,2023,2023,2023,260
+inverted,苦情件数,Complaints,2024,2024,2024,330

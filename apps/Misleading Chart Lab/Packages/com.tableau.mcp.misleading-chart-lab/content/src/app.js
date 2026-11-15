@@ -29,6 +29,11 @@
     bars3d: { perspective: 70 },
     pie3d: { tilt: 62, depth: 46, front: true, hideValues: true },
     category: { merge: 2 },
+    cherry: { window: 6 },
+    picto: { both: true },
+    cumulative: { cumulative: true },
+    multi: {},
+    inverted: { invert: true },
   };
   var DEFAULT_VARIANT = { interval: 'ratio', threeD: 'bars3d' };
 
@@ -130,7 +135,7 @@
     ui.good.replaceChildren(good.svg);
 
     // 記事の「5 つのチェック」のうち、この手口に対応するもの(3D は 4 番目)
-    var checkNo = Charts.ORDER.indexOf(state.pattern) + 1;
+    var checkNo = Charts.ORDER.indexOf(state.pattern) + 1; // 追加の手口は 0(どれも強調しない)
     ui.explain.replaceChildren(
       block('howItWorks', t('p_' + kind + '_how')),
       block('measured', t('p_' + kind + '_measure', bad.measure), 'is-measure'),
@@ -200,6 +205,10 @@
         check('pie3d_front', 'front', own), check('pie3d_hideValues', 'hideValues'));
     }
     if (kind === 'category') out.push(range('category_merge', 'merge', 0, Math.floor(d.items.length / 2), 1));
+    if (kind === 'cherry') out.push(range('cherry_window', 'window', 2, d.items.length, 1));
+    if (kind === 'picto') out.push(check('picto_both', 'both'));
+    if (kind === 'cumulative') out.push(check('cumulative_on', 'cumulative'));
+    if (kind === 'inverted') out.push(check('inverted_on', 'invert'));
     return out;
   }
 
@@ -261,12 +270,14 @@
       });
     });
 
-    var patternButtons = Charts.ORDER.map(function (id, i) {
+    var patternButton = function (id, no) {
       return el('button', {
         class: 'pattern', type: 'button', 'aria-pressed': String(state.pattern === id),
         onclick: function () { state.pattern = id; renderAll(); },
-      }, [el('span', { class: 'pattern-no', text: String(i + 1) }), el('span', { text: t('n_' + id) })]);
-    });
+      }, [el('span', { class: 'pattern-no', text: String(no) }), el('span', { text: t('n_' + id) })]);
+    };
+    var articleButtons = Charts.ORDER.map(function (id, i) { return patternButton(id, i + 1); });
+    var extraButtons = Charts.EXTRA.map(function (id, i) { return patternButton(id, Charts.ORDER.length + i + 1); });
 
     var fontSelect = el('select', {}, Object.keys(FONTS).map(function (key) {
       return el('option', { value: key, text: t(FONT_LABEL[key]) });
@@ -304,7 +315,7 @@
           el('label', { class: 'field is-stack' }, [el('span', { text: t('chartTitle') }), titleInput]),
         ].concat(trickControls(), [
           el('h2', { class: 'sep' }, [t('data'), el('small', { text: t('dataNote') })]),
-          dataEditor(),
+          el('div', { class: 'data-scroll' }, dataEditor()),
           el('button', {
             class: 'kit-btn', type: 'button', text: t('resetData'),
             onclick: function () {
@@ -330,7 +341,13 @@
       ]),
       el('div', { class: 'body' }, [
         el('aside', { class: 'side' }, [
-          el('section', { class: 'kit-card' }, [el('h2', { text: t('patterns') }), el('div', { class: 'patterns' }, patternButtons)]),
+          el('section', { class: 'kit-card' }, [
+            el('h2', { text: t('patterns') }),
+            el('div', { class: 'group-label', text: t('groupArticle') }),
+            el('div', { class: 'patterns' }, articleButtons),
+            el('div', { class: 'group-label', text: t('groupExtra') }),
+            el('div', { class: 'patterns' }, extraButtons),
+          ]),
           el('section', { class: 'kit-card' }, [
             el('h2', { text: t('style') }),
             colorField('mainColor', 'main'), colorField('accentColor', 'accent'),

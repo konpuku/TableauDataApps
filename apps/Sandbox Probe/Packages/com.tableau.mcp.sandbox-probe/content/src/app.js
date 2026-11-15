@@ -414,6 +414,23 @@
       });
     } },
 
+    { group: 'データ API', title: 'データソースのフィールド一覧(ds.fields)', note: '同梱 CSV の列がどの型・役割で解釈されたか', run: function () {
+      return info((ds.fields || []).map(function (f) {
+        return f.name + ':' + f.dataType + ':' + f.role + (f.isGenerated ? ':generated' : '');
+      }));
+    } },
+    { group: 'データ API', title: '従来 API で明細を読む(getLogicalTableDataAsync)', note: 'queryAsync とは別経路。データ自体が読めるかの切り分け', run: function () {
+      return ds.getLogicalTablesAsync().then(function (tables) {
+        return ds.getLogicalTableDataAsync(tables[0].id, { maxRows: 3 });
+      }).then(function (t) {
+        return ok({
+          totalRowCount: t.totalRowCount,
+          columns: t.columns.map(function (c) { return c.fieldName + ':' + c.dataType; }),
+          firstRow: (t.data[0] || []).map(function (c) { return c.formattedValue; }),
+        });
+      });
+    } },
+
     // --- Tableau REST API(fetch ブリッジ)---
     { group: 'REST API', title: 'REST 用メソッドの名前', note: 'ドキュメントは fetch()、同梱ライブラリの実装は fetchAsync', run: function () {
       var ext = tableau.extensions;
@@ -422,6 +439,23 @@
     { group: 'REST API', title: 'GET /api/{api-version}/serverinfo', note: 'サイト設定で許可されたパスだけ通るはず', run: restTest('/api/{api-version}/serverinfo') },
     { group: 'REST API', title: 'GET …/sites/{site-id}/projects?pageSize=1', run: restTest('/api/{api-version}/sites/{site-id}/projects?pageSize=1') },
     { group: 'REST API', title: 'GET …/sites/{site-id}(サイト情報)', run: restTest('/api/{api-version}/sites/{site-id}') },
+    { group: 'REST API', title: 'VizQL Data Service を REST で直接呼ぶ(read-metadata)',
+      note: 'queryAsync が失敗するとき、HTTP ステータスと本文で原因(利用上限など)を切り分ける', run: function () {
+        var ext = tableau.extensions;
+        var json = { Accept: 'application/json', 'Content-Type': 'application/json' };
+        return ext.fetchAsync('/api/{api-version}/sites/{site-id}/datasources?pageSize=1', { method: 'GET', headers: json })
+          .then(function (res) {
+            var list = JSON.parse(res.body).datasources.datasource;
+            if (!list || !list.length) return info({ message: 'サイトにパブリッシュ済みデータソースが無い' });
+            return ext.fetchAsync('/api/v1/vizql-data-service/read-metadata', {
+              method: 'POST', headers: json,
+              body: JSON.stringify({ datasource: { datasourceLuid: list[0].id } }),
+            }).then(function (vds) {
+              var detail = { ok: vds.ok, status: vds.status, statusText: vds.statusText, body: brief(vds.body, 240) };
+              return vds.ok ? ok(detail) : blocked(detail);
+            });
+          });
+      } },
   ];
 
   function restTest(url) {

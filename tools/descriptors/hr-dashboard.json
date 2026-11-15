@@ -1,0 +1,16 @@
+{
+  "caption": "Employee Master",
+  "repositoryId": "EmployeeMaster",
+  "fields": [
+    { "name": "employee_id", "datatype": "string", "role": "dimension" },
+    { "name": "department", "datatype": "string", "role": "dimension" },
+    { "name": "grade", "datatype": "string", "role": "dimension" },
+    { "name": "office", "datatype": "string", "role": "dimension" },
+    { "name": "employment_status", "datatype": "string", "role": "dimension" },
+    { "name": "employment_type", "datatype": "string", "role": "dimension" },
+    { "name": "hire_date", "datatype": "date", "role": "dimension" },
+    { "name": "termination_date", "datatype": "date", "role": "dimension" },
+    { "name": "annual_salary_jpy", "datatype": "integer", "role": "measure" },
+    { "name": "performance_rating", "datatype": "integer", "role": "measure" }
+  ]
+}

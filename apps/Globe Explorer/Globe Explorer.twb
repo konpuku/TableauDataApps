@@ -1,0 +1,276 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<workbook source-build='2026.3.4 (20263.26.1110.1356)' version='18.1' xml:base='https://localhost' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <Extensions />
+    <VizExtensions />
+    <_.fcp.Packages.true...Packages />
+    <_.fcp.VizExtensionsDupEncodingUUID.true...VizExtensionsDupEncodingUUID />
+    <AnimationOnByDefault />
+    <MarkAnimation />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+    <_.fcp.WorkbookFingerprinting.true...WorkbookFingerprinting />
+  </document-format-change-manifest>
+  <repository-location id='template' path='/workbooks' revision='1.0' />
+  <preferences />
+  <datasources>
+    <datasource caption='Earthquakes' inline='true' name='federated.430b337a33266a6bd6c535' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='Earthquakes' name='textscan.430b337a33266a6bd6c535'>
+            <connection class='textscan' directory='Data/Datasources' filename='earthquakes.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.430b337a33266a6bd6c535' name='earthquakes.csv' table='[earthquakes#csv]' type='table' />
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>Event ID</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[Event ID]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Event ID</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Time</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[Time]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Time</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>datetime</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Place</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[Place]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Place</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Area</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[Area]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Area</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Magnitude</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Magnitude]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Magnitude</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Depth Km</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Depth Km]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Depth Km</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Latitude</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Latitude]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Latitude</remote-alias>
+            <ordinal>6</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Longitude</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Longitude]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Longitude</remote-alias>
+            <ordinal>7</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Mag Type</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[Mag Type]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Mag Type</remote-alias>
+            <ordinal>8</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Event Type</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[Event Type]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Event Type</remote-alias>
+            <ordinal>9</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Significance</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Significance]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Significance</remote-alias>
+            <ordinal>10</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Tsunami</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[Tsunami]</local-name>
+            <parent-name>[earthquakes.csv]</parent-name>
+            <remote-alias>Tsunami</remote-alias>
+            <ordinal>11</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='Globe Explorer'>
+      <repository-location id='Sheet1' path='/workbooks/template' revision='' />
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Earthquakes' name='federated.430b337a33266a6bd6c535' />
+          </datasources>
+          <datasource-dependencies datasource='federated.430b337a33266a6bd6c535'>
+            <column aggregation='Count' datatype='string' name='[Event ID]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='datetime' name='[Time]' role='dimension' type='ordinal' />
+            <column aggregation='Count' datatype='string' name='[Place]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='string' name='[Area]' role='dimension' type='nominal' />
+            <column aggregation='Sum' datatype='real' name='[Magnitude]' role='measure' type='quantitative' />
+            <column aggregation='Sum' datatype='real' name='[Depth Km]' role='measure' type='quantitative' />
+            <column aggregation='Sum' datatype='real' name='[Latitude]' role='measure' type='quantitative' />
+            <column aggregation='Sum' datatype='real' name='[Longitude]' role='measure' type='quantitative' />
+            <column aggregation='Count' datatype='string' name='[Mag Type]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='string' name='[Event Type]' role='dimension' type='nominal' />
+            <column aggregation='Sum' datatype='integer' name='[Significance]' role='measure' type='quantitative' />
+            <column aggregation='Count' datatype='string' name='[Tsunami]' role='dimension' type='nominal' />
+            <column-instance column='[Event ID]' derivation='None' name='[none:Event ID:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Time]' derivation='None' name='[none:Time:nk]' pivot='key' type='ordinal' />
+            <column-instance column='[Place]' derivation='None' name='[none:Place:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Area]' derivation='None' name='[none:Area:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Magnitude]' derivation='Sum' name='[sum:Magnitude:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Depth Km]' derivation='Sum' name='[sum:Depth Km:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Latitude]' derivation='Sum' name='[sum:Latitude:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Longitude]' derivation='Sum' name='[sum:Longitude:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Mag Type]' derivation='None' name='[none:Mag Type:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Event Type]' derivation='None' name='[none:Event Type:nk]' pivot='key' type='nominal' />
+            <column-instance column='[Significance]' derivation='Sum' name='[sum:Significance:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[Tsunami]' derivation='None' name='[none:Tsunami:nk]' pivot='key' type='nominal' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='VizExtension' />
+            <add-in add-in-id='com.tableau.mcp.globe-explorer' extension-url='tableaulocalext:///com.tableau.mcp.globe-explorer/content/index.html' extension-version='1.0.0' instance-id='A1B2C3D4E5F60718293A4B5C6D7E8F90'>
+              <instance-settings />
+              <type-settings>
+                <worksheet />
+              </type-settings>
+            </add-in>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{D846E350-EFE9-46AE-88D6-906A4DB75930}' />
+    </worksheet>
+  </worksheets>
+  <windows>
+    <window class='worksheet' maximized='true' name='Globe Explorer'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='31'>
+            <card type='columns' />
+          </strip>
+          <strip size='31'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{5CCC5EFE-BD3C-4B06-B427-3A22F445F324}' />
+    </window>
+  </windows>
+  <referenced-extensions>
+    <referenced-extension>
+      <manifest manifest-version='0.1'>
+        <worksheet-extension extension-version='1.0.0' id='com.tableau.mcp.globe-explorer'>
+          <default-locale>en_US</default-locale>
+          <name>Globe Explorer</name>
+          <description>Embedded workbook extension.</description>
+          <author email='noreply@tableau.com' name='Claude' organization='Tableau' website='https://www.tableau.com' />
+          <min-api-version>1.11</min-api-version>
+          <source-location>
+            <url>tableaulocalext:///com.tableau.mcp.globe-explorer/content/index.html</url>
+          </source-location>
+          <icon>iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=</icon>
+          <permissions>
+            <permission>full data</permission>
+          </permissions>
+          <encoding id='field'>
+            <display-name>Data</display-name>
+            <role-spec>
+              <role-type>discrete-dimension</role-type>
+              <role-type>discrete-measure</role-type>
+              <role-type>continuous-dimension</role-type>
+              <role-type>continuous-measure</role-type>
+            </role-spec>
+            <fields max-count='50' />
+            <encoding-icon token='level' />
+          </encoding>
+        </worksheet-extension>
+      </manifest>
+      <referenced-views>
+        <referenced-view instances='1' viewId='Globe Explorer' />
+      </referenced-views>
+    </referenced-extension>
+  </referenced-extensions>
+</workbook>

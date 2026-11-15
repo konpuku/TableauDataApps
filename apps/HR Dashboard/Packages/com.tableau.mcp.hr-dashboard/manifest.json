@@ -1,0 +1,8 @@
+{
+  "id": "com.tableau.mcp.hr-dashboard",
+  "version": "1.0.0",
+  "manifestVersion": "0.1",
+  "name": "HR Dashboard",
+  "author": "Tableau MCP",
+  "requestedOrigins": ""
+}

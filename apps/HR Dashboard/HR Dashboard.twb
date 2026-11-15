@@ -1,0 +1,298 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<workbook source-build='2026.3.4 (20263.26.1110.1356)' version='18.1' xml:base='https://localhost' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <Extensions />
+    <VizExtensions />
+    <_.fcp.Packages.true...Packages />
+    <_.fcp.VizExtensionsDupEncodingUUID.true...VizExtensionsDupEncodingUUID />
+    <AnimationOnByDefault />
+    <MarkAnimation />
+    <SheetIdentifierTracking />
+    <WindowsPersistSimpleIdentifiers />
+    <_.fcp.WorkbookFingerprinting.true...WorkbookFingerprinting />
+  </document-format-change-manifest>
+  <repository-location id='template' path='/workbooks' revision='1.0' />
+  <preferences />
+  <datasources>
+    <datasource caption='Employee Master' inline='true' name='sqlproxy.97ec983f495907e4fc3e57' version='18.1'>
+      <repository-location id='EmployeeMaster' path='/datasources' revision='1.0' />
+      <connection channel='https' class='sqlproxy' dbname='EmployeeMaster' directory='dataserver' server-ds-friendly-name='Employee Master' username=''>
+        <relation type='collection'>
+          <relation connection='sqlproxy.97ec983f495907e4fc3e57' name='sqlproxy' table='[sqlproxy]' type='table' />
+        </relation>
+        <metadata-records>
+          <metadata-record class='column'>
+            <remote-name>employee_id</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[employee_id]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>employee_id</remote-alias>
+            <ordinal>0</ordinal>
+            <layered>true</layered>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>0</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>department</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[department]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>department</remote-alias>
+            <ordinal>1</ordinal>
+            <layered>true</layered>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>0</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>grade</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[grade]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>grade</remote-alias>
+            <ordinal>2</ordinal>
+            <layered>true</layered>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>0</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>office</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[office]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>office</remote-alias>
+            <ordinal>3</ordinal>
+            <layered>true</layered>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>0</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>employment_status</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[employment_status]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>employment_status</remote-alias>
+            <ordinal>4</ordinal>
+            <layered>true</layered>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>0</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>employment_type</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[employment_type]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>employment_type</remote-alias>
+            <ordinal>5</ordinal>
+            <layered>true</layered>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>0</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>hire_date</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[hire_date]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>hire_date</remote-alias>
+            <ordinal>6</ordinal>
+            <layered>true</layered>
+            <local-type>date</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>0</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>termination_date</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[termination_date]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>termination_date</remote-alias>
+            <ordinal>7</ordinal>
+            <layered>true</layered>
+            <local-type>date</local-type>
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>0</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>annual_salary_jpy</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[annual_salary_jpy]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>annual_salary_jpy</remote-alias>
+            <ordinal>8</ordinal>
+            <layered>true</layered>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>1</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>performance_rating</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[performance_rating]</local-name>
+            <parent-name>[sqlproxy]</parent-name>
+            <remote-alias>performance_rating</remote-alias>
+            <ordinal>9</ordinal>
+            <layered>true</layered>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='integer' name='field-type'>1</attribute>
+              <attribute datatype='integer' name='role'>1</attribute>
+            </attributes>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='HR Dashboard'>
+      <repository-location id='Sheet1' path='/workbooks/template' revision='' />
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='Employee Master' name='sqlproxy.97ec983f495907e4fc3e57' />
+          </datasources>
+          <datasource-dependencies datasource='sqlproxy.97ec983f495907e4fc3e57'>
+            <column aggregation='Count' datatype='string' name='[employee_id]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='string' name='[department]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='string' name='[grade]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='string' name='[office]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='string' name='[employment_status]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='string' name='[employment_type]' role='dimension' type='nominal' />
+            <column aggregation='Count' datatype='date' name='[hire_date]' role='dimension' type='ordinal' />
+            <column aggregation='Count' datatype='date' name='[termination_date]' role='dimension' type='ordinal' />
+            <column aggregation='Sum' datatype='integer' name='[annual_salary_jpy]' role='measure' type='quantitative' />
+            <column aggregation='Sum' datatype='integer' name='[performance_rating]' role='measure' type='quantitative' />
+            <column-instance column='[employee_id]' derivation='None' name='[none:employee_id:nk]' pivot='key' type='nominal' />
+            <column-instance column='[department]' derivation='None' name='[none:department:nk]' pivot='key' type='nominal' />
+            <column-instance column='[grade]' derivation='None' name='[none:grade:nk]' pivot='key' type='nominal' />
+            <column-instance column='[office]' derivation='None' name='[none:office:nk]' pivot='key' type='nominal' />
+            <column-instance column='[employment_status]' derivation='None' name='[none:employment_status:nk]' pivot='key' type='nominal' />
+            <column-instance column='[employment_type]' derivation='None' name='[none:employment_type:nk]' pivot='key' type='nominal' />
+            <column-instance column='[hire_date]' derivation='None' name='[none:hire_date:nk]' pivot='key' type='ordinal' />
+            <column-instance column='[termination_date]' derivation='None' name='[none:termination_date:nk]' pivot='key' type='ordinal' />
+            <column-instance column='[annual_salary_jpy]' derivation='Sum' name='[sum:annual_salary_jpy:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[performance_rating]' derivation='Sum' name='[sum:performance_rating:qk]' pivot='key' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='VizExtension' />
+            <add-in add-in-id='com.tableau.mcp.hr-dashboard' extension-url='tableaulocalext:///com.tableau.mcp.hr-dashboard/content/index.html' extension-version='1.0.0' instance-id='A1B2C3D4E5F60718293A4B5C6D7E8F90'>
+              <instance-settings />
+              <type-settings>
+                <worksheet />
+              </type-settings>
+            </add-in>
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{D846E350-EFE9-46AE-88D6-906A4DB75930}' />
+    </worksheet>
+  </worksheets>
+  <windows>
+    <window class='worksheet' maximized='true' name='HR Dashboard'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='31'>
+            <card type='columns' />
+          </strip>
+          <strip size='31'>
+            <card type='rows' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{5CCC5EFE-BD3C-4B06-B427-3A22F445F324}' />
+    </window>
+  </windows>
+  <referenced-extensions>
+    <referenced-extension>
+      <manifest manifest-version='0.1'>
+        <worksheet-extension extension-version='1.0.0' id='com.tableau.mcp.hr-dashboard'>
+          <default-locale>en_US</default-locale>
+          <name>HR Dashboard</name>
+          <description>Embedded workbook extension.</description>
+          <author email='noreply@tableau.com' name='Claude' organization='Tableau' website='https://www.tableau.com' />
+          <min-api-version>1.11</min-api-version>
+          <source-location>
+            <url>tableaulocalext:///com.tableau.mcp.hr-dashboard/content/index.html</url>
+          </source-location>
+          <icon>iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=</icon>
+          <permissions>
+            <permission>full data</permission>
+          </permissions>
+          <encoding id='field'>
+            <display-name>Data</display-name>
+            <role-spec>
+              <role-type>discrete-dimension</role-type>
+              <role-type>discrete-measure</role-type>
+              <role-type>continuous-dimension</role-type>
+              <role-type>continuous-measure</role-type>
+            </role-spec>
+            <fields max-count='50' />
+            <encoding-icon token='level' />
+          </encoding>
+        </worksheet-extension>
+      </manifest>
+      <referenced-views>
+        <referenced-view instances='1' viewId='HR Dashboard' />
+      </referenced-views>
+    </referenced-extension>
+  </referenced-extensions>
+</workbook>

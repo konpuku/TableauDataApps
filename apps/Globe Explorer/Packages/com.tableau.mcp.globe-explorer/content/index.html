@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Globe Explorer</title>
+    <link rel="stylesheet" href="src/kit.css" />
+    <link rel="stylesheet" href="src/styles.css" />
+  </head>
+  <body>
+    <!-- app.js が置き換える。これが残っていたらスクリプトが動いていない。 -->
+    <div id="app"><p class="kit-boot">Globe Explorer を読み込み中…</p></div>
+    <!-- ビルド工程なし。すべてパッケージ内に同梱した classic script(CDN は CSP で遮断される)。 -->
+    <script src="src/tableau.extensions.1.latest.min.js"></script>
+    <script src="src/kit.js"></script>
+    <script src="src/vendor/d3-array.min.js"></script>
+    <script src="src/vendor/d3-geo.min.js"></script>
+    <script src="src/vendor/topojson-client.min.js"></script>
+    <!-- 地形は fetch できない(null オリジンで CORS 不可)ので、グローバル変数を置く .js として同梱。 -->
+    <script src="src/vendor/world-110m.js"></script>
+    <script src="src/globe.js"></script>
+    <script src="src/app.js"></script>
+  </body>
+</html>

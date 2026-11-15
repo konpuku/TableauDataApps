@@ -1,0 +1,19 @@
+{
+  "type": "file",
+  "caption": "Earthquakes",
+  "file": "Data/Datasources/earthquakes.csv",
+  "fields": [
+    { "name": "Event ID", "datatype": "string", "role": "dimension" },
+    { "name": "Time", "datatype": "datetime", "role": "dimension" },
+    { "name": "Place", "datatype": "string", "role": "dimension" },
+    { "name": "Area", "datatype": "string", "role": "dimension" },
+    { "name": "Magnitude", "datatype": "real", "role": "measure" },
+    { "name": "Depth Km", "datatype": "real", "role": "measure" },
+    { "name": "Latitude", "datatype": "real", "role": "measure" },
+    { "name": "Longitude", "datatype": "real", "role": "measure" },
+    { "name": "Mag Type", "datatype": "string", "role": "dimension" },
+    { "name": "Event Type", "datatype": "string", "role": "dimension" },
+    { "name": "Significance", "datatype": "integer", "role": "measure" },
+    { "name": "Tsunami", "datatype": "string", "role": "dimension" }
+  ]
+}

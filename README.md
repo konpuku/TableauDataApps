@@ -15,9 +15,10 @@ Tableau Data Apps(Tableau Cloud 限定ベータ)を実際に作ってパブリ�
 | --- | --- | --- | --- |
 | [Globe Explorer](apps/Globe%20Explorer) | 地球儀での地図表現 | 同梱 CSV(USGS の地震 1 週間分・1,707 件) | Canvas + d3-geo の地球儀、ライブラリと地形データの同梱、操作→フィルター→再クエリ |
 | [HR Dashboard](apps/HR%20Dashboard) | HR ダッシュボード | パブリッシュ済みデータソース | パブリッシュ済み DS への接続、集計値だけを出す設計、クリックでの絞り込み |
+| [Misleading Chart Lab](apps/Misleading%20Chart%20Lab) | 詐欺グラフの啓発教材 | 同梱 CSV(架空の数値) | 誤解を招くグラフ 5 種を「正直なグラフ」と並べて作る。色・フォントの変更、日英切替、画面内でのデータ編集 |
 | [Sandbox Probe](apps/Sandbox%20Probe) | 仕様の検証そのもの | 同梱 CSV(同上) | サンドボックス・CSP・クエリ API・REST ブリッジを約 60 項目、実際に試して記録 |
 
-Globe Explorer と Sandbox Probe はデータを同梱しているので、どのサイトにもそのままパブリッシュできます。
+Globe Explorer・Misleading Chart Lab・Sandbox Probe はデータを同梱しているので、どのサイトにもそのままパブリッシュできます。
 HR Dashboard は `Employee Master` という名前のパブリッシュ済みデータソース(列は [descriptor](tools/descriptors/hr-dashboard.json) を参照)が前提です。
 
 ## 使い方

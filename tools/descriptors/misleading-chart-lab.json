@@ -1,0 +1,14 @@
+{
+  "type": "file",
+  "caption": "Chart Samples",
+  "file": "Data/Datasources/chart-samples.csv",
+  "fields": [
+    { "name": "Pattern", "datatype": "string", "role": "dimension" },
+    { "name": "Series JA", "datatype": "string", "role": "dimension" },
+    { "name": "Series EN", "datatype": "string", "role": "dimension" },
+    { "name": "Label JA", "datatype": "string", "role": "dimension" },
+    { "name": "Label EN", "datatype": "string", "role": "dimension" },
+    { "name": "Position", "datatype": "integer", "role": "measure" },
+    { "name": "Value", "datatype": "real", "role": "measure" }
+  ]
+}

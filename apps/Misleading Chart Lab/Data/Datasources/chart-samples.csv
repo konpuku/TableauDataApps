@@ -1,0 +1,33 @@
+Pattern,Series JA,Series EN,Label JA,Label EN,Position,Value
+dual,業界大手,Industry leader,2019,2019,2019,4800
+dual,業界大手,Industry leader,2020,2020,2020,4950
+dual,業界大手,Industry leader,2021,2021,2021,5100
+dual,業界大手,Industry leader,2022,2022,2022,5300
+dual,業界大手,Industry leader,2023,2023,2023,5450
+dual,業界大手,Industry leader,2024,2024,2024,5600
+dual,自社,Our company,2019,2019,2019,20
+dual,自社,Our company,2020,2020,2020,26
+dual,自社,Our company,2021,2021,2021,33
+dual,自社,Our company,2022,2022,2022,41
+dual,自社,Our company,2023,2023,2023,50
+dual,自社,Our company,2024,2024,2024,60
+truncate,満足度,Satisfaction,自社,Our company,1,86.2
+truncate,満足度,Satisfaction,競合B,Rival B,2,84.9
+truncate,満足度,Satisfaction,競合C,Rival C,3,83.7
+truncate,満足度,Satisfaction,競合D,Rival D,4,82.5
+interval,会員数,Members,1990,1990,1990,120
+interval,会員数,Members,2000,2000,2000,150
+interval,会員数,Members,2010,2010,2010,190
+interval,会員数,Members,2020,2020,2020,240
+interval,会員数,Members,2022,2022,2022,300
+interval,会員数,Members,2023,2023,2023,345
+interval,会員数,Members,2024,2024,2024,400
+pie3d,シェア,Share,自社,Our company,1,23
+pie3d,シェア,Share,A社,Company A,2,30
+pie3d,シェア,Share,B社,Company B,3,27
+pie3d,シェア,Share,その他,Others,4,20
+category,回答,Responses,とても満足,Very satisfied,1,14
+category,回答,Responses,満足,Satisfied,2,21
+category,回答,Responses,どちらともいえない,Neither,3,33
+category,回答,Responses,不満,Dissatisfied,4,19
+category,回答,Responses,とても不満,Very dissatisfied,5,13

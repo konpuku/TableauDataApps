@@ -1,0 +1,8 @@
+{
+  "id": "com.tableau.mcp.misleading-chart-lab",
+  "version": "1.0.0",
+  "manifestVersion": "0.1",
+  "name": "Misleading Chart Lab",
+  "author": "Tableau MCP",
+  "requestedOrigins": ""
+}

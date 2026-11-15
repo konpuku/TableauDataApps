@@ -57,6 +57,7 @@ node tools/preview/server.mjs "apps/Globe Explorer" 4173
 
 モックは VizQL Data Service のクエリの一部(集計・日付関数・主なフィルター)だけを再現します。
 サンドボックス(null オリジン、CSP)は再現しないので、最終確認は必ずパブリッシュ後に Tableau で行ってください。
+URL に `?failQuery=1` を付けると `queryAsync` の失敗を再現でき、代替経路の表示を確かめられます。
 HR Dashboard のプレビューは架空データ(`tools/data/build-hr-mock.mjs` で生成)を使います。
 
 ## 構成
@@ -71,7 +72,7 @@ apps/<App Name>/            ワークスペース(.twbx の中身そのもの)
   Data/                     同梱データ(.twb が参照するものだけ梱包)
   Resources/.agents/        AI エージェント向けのメモ(Tableau は無視する)
   mock/                     ローカルプレビュー用(梱包されない)
-shared/                     全アプリ共通の kit.js / kit.css(編集はここ)
+shared/                     全アプリ共通の kit.js / kit.css / local-query.js(編集はここ)
 template/                   scaffold-data-app が返す未置換テンプレート
 tools/                      dataapp.py(new / wire / package)、プレビュー、データ生成
 docs/                       検証で分かったこと

@@ -213,7 +213,10 @@
     ]).then(function () {
       if (mine !== requestId) return;
       ui.root.classList.remove('is-loading');
-      ui.foot.textContent = '今回の更新 ' + Math.round(performance.now() - started) +
+      var mode = Kit.stats.fallbackQueries
+        ? '代替経路で表示中(queryAsync が失敗: ' + Kit.stats.fallbackReason + ' → 従来 API で明細を読みブラウザ内で集計)'
+        : 'ライブクエリ(queryAsync)';
+      ui.foot.textContent = mode + ' · 今回の更新 ' + Math.round(performance.now() - started) +
         ' ms(累計 ' + Kit.stats.queries + ' 本、キャッシュ利用 ' + Kit.stats.cacheHits + ' 回)· データ: USGS All Earthquakes, 2018-01-31〜02-07(同梱 CSV)';
     });
   }
@@ -325,6 +328,8 @@
   mount();
   Kit.boot(function (ctx) {
     ds = Kit.requireSource(ctx, SOURCE);
+    // 公開データ・1,707 行なので、queryAsync が使えないときは明細を読んでブラウザ内で集計する。
+    Kit.enableLocalFallback(ds);
     refresh();
   });
 })();

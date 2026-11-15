@@ -70,7 +70,9 @@ sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox
 | localStorage / sessionStorage / IndexedDB / cookie | 不可 | 「sandboxed and lacks the 'allow-same-origin' flag」 |
 | 親フレームの DOM | 不可 | クロスオリジン扱い |
 | Extensions API の `settings` | 可(有無のみ確認) | 状態を持ちたいときの唯一の候補。保存の動作は未確認 |
-| ポップアップ | 未確認 | `sandbox` に `allow-popups` はある。手動テストで確認する |
+| ポップアップ(`window.open`) | 可 | `sandbox` に `allow-popups` がある。サイト設定でポップアップを許可していない場合は未確認 |
+| クリップボードへの書き込み | 不可 | `NotAllowedError`: permissions policy でブロック。「コピー」ボタンは作れないので、選択できるテキスト欄を出す |
+| ファイルのダウンロード(Blob + `a[download]`) | 未確認 | クリックは実行できた。実際に保存されたかは未確認 |
 
 **設計への影響**
 
@@ -97,40 +99,63 @@ sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox
 - `getSummaryDataAsync()` は列 0・行 0(Data App はマークカードにフィールドを置かないため)。**確認済み**
 - ライブラリ内部のサービス名は `Hbi`(Headless BI)。`queryAsync` の第 2 引数にオプションを渡せる。**確認済み**(ソース)/ 効くオプションは **未確認**
 
-### queryAsync / readMetadataAsync が全滅した(確認済み・原因は未確定)
+### 利用上限に達すると queryAsync は全滅する(確認済み)
 
-Sandbox Probe の 1 回目の実行では、`readMetadataAsync()` と、内容の異なる約 30 本の `queryAsync()` が
-**すべて同じエラー** で失敗した。
+検証サイトで VizQL Data Service(VDS)の利用上限に達した状態になり、次のことが分かった。
 
-```text
-name: Error / errorCode: internal-error / message: "internal-error: error"
-```
+**観察したこと**
 
-- 存在しないフィールドを指定したクエリも、正しいクエリも同じエラー。クエリの中身を見る前に失敗している。
-- 並列 10 本は 226 ms で全滅。問い合わせはすぐに拒否されている。
-- 同じ時間帯、Tableau MCP 経由の VizQL Data Service 呼び出しも `API usage limit reached.` で失敗し続けていた。
-- 一方、同じデータソースへの従来 API(`getLogicalTablesAsync()`)と REST ブリッジは正常に動いた。
+- `readMetadataAsync()` と、内容の異なる約 30 本の `queryAsync()` が、すべて同じエラーで失敗した。
+  存在しないフィールドを指定したクエリも同じエラー。並列 10 本は約 230 ms で全滅(すぐに拒否される)。
 
-いちばん有力な説明は「サイトの VizQL Data Service の利用上限に達しており、Data App の `queryAsync()` も同じ枠を使う」。
-ただし「同梱 CSV(抽出でないファイル接続)が `queryAsync` の対象外」という可能性も残っている。
-切り分けのため、Probe に次の 3 つを追加した。
+  ```text
+  name: Error / errorCode: internal-error / message: "internal-error: error"
+  ```
 
-1. `ds.fields` の一覧(CSV の列がどの型で解釈されたか)
-2. 従来 API での明細取得(データ自体は読めるか)
-3. REST ブリッジ経由で VizQL Data Service を直接呼ぶ(HTTP ステータスと本文が見える)
+- 同じ画面から REST ブリッジで VDS を直接呼ぶと、原因がはっきり返ってきた。
 
-**どちらが原因でも言えること**: アプリからは `internal-error: error` としか見えず、原因を区別できない。
-利用者向けには「データを取得できませんでした。時間をおいて再度お試しください」程度の文言にし、
-詳細はエラーコードとして控えめに添えるのが現実的。
+  ```text
+  POST /api/v1/vizql-data-service/read-metadata
+  → 429 {"errorCode":"429000","message":"API 使用量の上限に達しました。"}
+  ```
 
-### VizQL Data Service の利用上限(確認済み)
+- 同じ時間帯、Tableau MCP 経由の VDS 呼び出しも `API usage limit reached.` で失敗し続けた(1 時間近く回復せず)。
+- 上限に達する前に VDS を呼んだのは、Tableau MCP からの数回だけだった(メタデータ取得とクエリ)。
+  Data App からのクエリは、上限に達した後にしか投げていない。
 
-検証中、Tableau MCP 経由の `get-datasource-metadata` / `query-datasource` が
-`429` → `API usage limit reached.` を返し、その後しばらく回復しなかった(同じサイトでの数回の呼び出しの後)。
+**分かったこと**
 
-- VizQL Data Service には利用上限がある。30 分以上たっても回復しなかったので、短い時間窓のレート制限ではなさそう。
-- Data App の中の `queryAsync()` が同じ枠を消費するかは上の節のとおり切り分け中。
-- 念のため、アプリ側は同じクエリをセッション内でキャッシュし、スライダー操作はデバウンスしている(`shared/kit.js`)。
+- Data App の `queryAsync()` / `readMetadataAsync()` は VDS の利用枠を使う。枠が尽きるとアプリのデータ取得は全部止まる。
+- その枠は Tableau MCP など他の VDS 利用者と共有されている。**AI アシスタントでデータを調べながら Data App を作ると、
+  開発中の問い合わせで枠を使い切り、できあがったアプリが動かない** ということが起こる(今回がまさにそれ)。
+- アプリ側には `internal-error` としか伝わらない。利用上限なのか、権限なのか、クエリの誤りなのかを区別できない。
+- 上限の大きさと回復のタイミングは **未確認**(サイトのライセンスやベータの設定に依存する可能性がある)。
+
+**上限中でも動いたもの**
+
+| 経路 | 結果 |
+| --- | --- |
+| `workbook.getAllDataSourcesAsync()`、`ds.fields` | 可 |
+| 従来 API の `ds.getLogicalTablesAsync()` / `getLogicalTableDataAsync()`(明細の取得) | 可 |
+| REST ブリッジ `fetchAsync()`(VDS 以外のパス) | 可 |
+
+従来 API は VDS を通らないので、利用上限の影響を受けない。
+
+**対処(このリポジトリで採ったもの)**
+
+- 原因を知りたいときは、REST ブリッジで VDS を直接呼ぶと HTTP ステータスと本文が読める(Sandbox Probe に実装)。
+- `shared/kit.js` に代替経路を用意した。`Kit.enableLocalFallback(ds)` を呼んでおくと、`queryAsync` が失敗したときに
+  従来 API で明細を読み、同じクエリをブラウザ内で評価する(`shared/local-query.js`)。Globe Explorer で有効にしている。
+- ただし代替経路は明細がそのままブラウザに届く。行数が少なく、全員に見せてよいデータに限る(従来 API の上限は 10,000 行)。
+  HR Dashboard は個人の行を取得しない方針なので、有効にしていない。
+- 同じクエリはセッション内でキャッシュし、スライダー操作はデバウンスして、枠の消費を抑える。
+
+### 同梱 CSV の解釈(確認済み)
+
+- 型は意図どおり: `Time` は date-time、`Magnitude` などは float、`Significance` は int。数値はメジャー、文字列と日時はディメンション。
+- `Latitude` / `Longitude` という列名から、Tableau が地理的役割の生成フィールド(`緯度 (生成)` / `経度 (生成)` / `Geometry (generated)`)を自動で追加した。
+- データソースは `isExtract: false` / `isPublished: false`。論理テーブル名は `完全データ` と表示された。
+- 従来 API の日時の `formattedValue` はロケール依存(`2018/02/07 1:26:13`)。機械処理には `value` を使う。
 
 ## 5. 表示・共有
 
@@ -147,11 +172,12 @@ name: Error / errorCode: internal-error / message: "internal-error: error"
 
 ## 7. これから確かめること
 
-- `queryAsync` 全滅の原因(利用上限か、同梱 CSV の非対応か)。更新した Sandbox Probe の結果で判断する
-- 原因が利用上限なら、上限の大きさ・回復のタイミング・Data App の 1 画面表示が何回分にあたるか
-- `queryAsync` の対応範囲(集計関数・日付関数・ビン・計算フィールド・各フィルター・並べ替え・オプション)、明細の行数上限、応答時間 — クエリが通るようになってから
+- VDS の利用上限の大きさ・回復のタイミング・Data App の 1 画面表示が何回分にあたるか
+- `queryAsync` の対応範囲(集計関数・日付関数・ビン・計算フィールド・各フィルター・並べ替え・オプション)、明細の行数上限、応答時間 — 枠が回復してから Sandbox Probe を開けば一度に分かる
+- 同梱 CSV(抽出でないファイル接続)に対して `queryAsync` が通るか — 同上
+- 代替経路(従来 API)がパブリッシュ済みデータソースでも使えるか、行レベルセキュリティが効くか
 - HR Dashboard の `performance_rating` がディメンション / メジャーどちらで返るか(アプリは両対応にしてある)
-- ポップアップ・クリップボード・ファイル保存(Probe の手動テスト)、`settings` の保存
-- REST ブリッジで許可されていないパスを呼んだときの応答(検証サイトは試した GET がすべて通った)
-- 権限の無いユーザーで開いたときの見え方、行レベルセキュリティの効き方
+- ファイルのダウンロード、`settings` の保存
+- REST ブリッジで許可されていないパスを呼んだときの応答(検証サイトは試した呼び出しがすべてブリッジを通過した)
+- 権限の無いユーザーで開いたときの見え方
 - 埋め込み(Embedding API)・モバイル・Tableau Desktop での表示

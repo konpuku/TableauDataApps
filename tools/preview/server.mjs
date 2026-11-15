@@ -62,6 +62,7 @@ createServer((req, res) => {
     if (path.endsWith('/tableau.extensions.1.latest.min.js')) {
       res.writeHead(200, { 'content-type': TYPES['.js'] });
       res.end(`window.__MOCK_SOURCES__ = ${JSON.stringify(mockSources())};\n` +
+        readFileSync(join(here, '..', '..', 'shared', 'local-query.js'), 'utf8') + '\n' +
         readFileSync(join(here, 'mock-tableau.js'), 'utf8'));
       return;
     }

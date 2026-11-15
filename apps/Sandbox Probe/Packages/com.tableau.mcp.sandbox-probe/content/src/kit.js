@@ -11,7 +11,7 @@
 (function () {
   'use strict';
 
-  var stats = { queries: 0, cacheHits: 0, rows: 0, ms: 0, log: [] };
+  var stats = { queries: 0, cacheHits: 0, fallbackQueries: 0, fallbackReason: null, rows: 0, ms: 0, log: [] };
   var cache = new Map();
 
   /** 安全な DOM 生成。attrs の on* はリスナー、style はオブジェクト、それ以外は属性。 */
@@ -116,7 +116,13 @@
       return cache.get(key);
     }
     var started = performance.now();
-    var promise = ds.queryAsync(body).then(function (res) {
+    var promise = ds.queryAsync(body).catch(function (err) {
+      if (!fallbackSources[ds.name] || !window.LocalQuery) throw err;
+      // queryAsync が使えない(利用上限など)。従来 API で明細を読み、ブラウザ内で集計する。
+      stats.fallbackQueries += 1;
+      stats.fallbackReason = errorText(err);
+      return loadRows(ds).then(function (rows) { return window.LocalQuery.run(rows, body); });
+    }).then(function (res) {
       var rows = res && Array.isArray(res.data) ? res.data : [];
       var ms = performance.now() - started;
       stats.queries += 1;
@@ -131,6 +137,37 @@
   }
 
   function clearCache() { cache.clear(); }
+
+  var fallbackSources = Object.create(null);
+  var tableRows = Object.create(null);
+
+  /**
+   * queryAsync が失敗したときに、従来 API(getLogicalTableDataAsync)で明細を全件読み、
+   * ブラウザ内で同じクエリを評価する代替経路を、このデータソースに対して有効にする。
+   *
+   * 明細がそのままブラウザに届くので、行数が少なく、全員に見せてよいデータにだけ使う
+   * (個人情報を含むデータソースでは有効にしない)。従来 API の上限は 10,000 行。
+   */
+  function enableLocalFallback(ds) { fallbackSources[ds.name] = true; }
+
+  function loadRows(ds) {
+    if (tableRows[ds.name]) return tableRows[ds.name];
+    tableRows[ds.name] = ds.getLogicalTablesAsync().then(function (tables) {
+      return ds.getLogicalTableDataAsync(tables[0].id);
+    }).then(function (table) {
+      return table.data.map(function (cells) {
+        var row = {};
+        table.columns.forEach(function (column, i) {
+          var cell = cells[i], native = cell.nativeValue;
+          // 日付は Date になるので、VDS と同じ "YYYY-MM-DD hh:mm:ss" 形の文字列(value)を使う
+          row[column.fieldName] = native instanceof Date ? cell.value : native;
+        });
+        return row;
+      });
+    });
+    tableRows[ds.name].catch(function () { delete tableRows[ds.name]; });
+    return tableRows[ds.name];
+  }
 
   /** 集計列を読む。別名が効かない場合に備えて "FUNC(Caption)" 形のキーにもフォールバックする。 */
   function val(row, alias, fallbackKey) {
@@ -292,7 +329,7 @@
   }
 
   window.Kit = {
-    el: el, fatal: fatal, boot: boot, requireSource: requireSource, query: query, clearCache: clearCache,
+    el: el, fatal: fatal, boot: boot, requireSource: requireSource, query: query, clearCache: clearCache, enableLocalFallback: enableLocalFallback,
     val: val, num: num, compact: compact, debounce: debounce, tooltip: tooltip,
     columns: columns, bars: bars, legend: legend, errorText: errorText, stats: stats,
   };

@@ -20,18 +20,23 @@
   };
   var FONT_LABEL = { sans: 'fontSans', serif: 'fontSerif', round: 'fontRound', mono: 'fontMono', impact: 'fontImpact' };
   var DEFAULT_STYLE = { main: '#2a78d6', accent: '#eb6834', bg: '#ffffff', ink: '#0b0b0b', fontKey: 'sans', size: 14 };
+  // 手口の調整値は「描き方」(kind)ごとに持つ。
   var DEFAULT_PARAMS = {
     dual: { hideRight: true },
     truncate: { start: 82 },
+    ratio: { inflate: 18 },
     interval: { even: true },
+    bars3d: { perspective: 70 },
     pie3d: { tilt: 62, depth: 46, front: true, hideValues: true },
-    category: { cut: 3 },
+    category: { merge: 2 },
   };
+  var DEFAULT_VARIANT = { interval: 'ratio', threeD: 'bars3d' };
 
   var state = {
     lang: 'ja',
     pattern: 'dual',
     style: Object.assign({}, DEFAULT_STYLE),
+    variant: Object.assign({}, DEFAULT_VARIANT), // 手口 3・4 で選んでいるグラフの種類
     params: JSON.parse(JSON.stringify(DEFAULT_PARAMS)),
     titles: {},   // 手口ごとに、利用者が書き換えた見出し(未編集なら既定の文言)
     data: null,   // 手口ごとの現在のデータ
@@ -46,6 +51,8 @@
     return text.replace(/\{(\w+)\}/g, function (m, name) { return vars && vars[name] != null ? vars[name] : m; });
   }
   var loc = function (pair) { return pair[state.lang] != null ? pair[state.lang] : pair.ja; };
+  /** いま選んでいる手口の「描き方」。手口 3・4 は種類の切り替えで変わる。 */
+  var kindOf = function (pattern) { return Charts.VARIANTS[pattern] ? state.variant[pattern] : pattern; };
 
   // ---- データ -----------------------------------------------------------------
   function fetchSamples(ds) {
@@ -66,7 +73,7 @@
         });
       });
       var out = {};
-      Charts.ORDER.forEach(function (pattern) {
+      Charts.DATASETS.forEach(function (pattern) {
         var list = (by[pattern] || []).sort(function (a, b) { return a.pos - b.pos; });
         if (!list.length) throw new Error('サンプルデータに "' + pattern + '" の行がありません');
         if (pattern === 'dual') {
@@ -96,43 +103,45 @@
   var clone = function (x) { return JSON.parse(JSON.stringify(x)); };
 
   /** 現在の言語に合わせた、描画用のデータ。 */
-  function viewData(pattern) {
-    var d = state.data[pattern];
-    if (pattern === 'dual') {
+  function viewData(kind) {
+    var d = state.data[kind];
+    if (kind === 'dual') {
       return { labels: d.labels.map(loc), series: d.series.map(function (s) { return { name: loc(s.name), values: s.values }; }) };
     }
     var items = d.items.map(function (i) { return { label: loc(i.label), x: i.x, value: i.value }; });
-    return pattern === 'interval' ? { points: items } : { items: items };
+    return kind === 'interval' ? { points: items } : { items: items };
   }
 
-  function titleFor(pattern, deceptive) {
-    var custom = state.titles[pattern + '.' + state.lang];
+  function titleFor(kind, deceptive) {
+    var custom = state.titles[kind + '.' + state.lang];
     if (deceptive && custom != null) return custom;
-    if (!deceptive) return t('p_' + pattern + '_honest');
-    if (pattern !== 'category') return t('p_' + pattern + '_title');
-    var items = state.data.category.items, total = items.reduce(function (a, b) { return a + b.value; }, 0) || 1;
-    var pos = items.slice(0, state.params.category.cut).reduce(function (a, b) { return a + b.value; }, 0);
-    return t('p_category_title', { pct: Math.round((pos / total) * 100) });
+    return t('p_' + kind + (deceptive ? '_title' : '_honest'));
   }
 
   // ---- 描画 -------------------------------------------------------------------
   function renderCharts() {
     if (!state.data) return;
-    var pattern = state.pattern;
+    var kind = kindOf(state.pattern);
     var style = Object.assign({}, state.style, { font: FONTS[state.style.fontKey] });
-    var base = { data: viewData(pattern), params: state.params[pattern], style: style, t: t };
-    var bad = Charts.render(pattern, Object.assign({ deceptive: true, title: titleFor(pattern, true) }, base));
-    var good = Charts.render(pattern, Object.assign({ deceptive: false, title: titleFor(pattern, false) }, base));
+    var base = { data: viewData(kind), params: state.params[kind], style: style, t: t };
+    var bad = Charts.render(kind, Object.assign({ deceptive: true, title: titleFor(kind, true) }, base));
+    var good = Charts.render(kind, Object.assign({ deceptive: false, title: titleFor(kind, false) }, base));
     ui.bad.replaceChildren(bad.svg);
     ui.good.replaceChildren(good.svg);
 
-    var measure = Object.assign({}, bad.measure);
-    if (pattern === 'pie3d') measure.a = viewData('pie3d').items[0].label;
+    // 記事の「5 つのチェック」のうち、この手口に対応するもの(3D は 4 番目)
+    var checkNo = Charts.ORDER.indexOf(state.pattern) + 1;
     ui.explain.replaceChildren(
-      block('howItWorks', t('p_' + pattern + '_how')),
-      block('measured', t('p_' + pattern + '_measure', measure), 'is-measure'),
-      block('howToSpot', t('p_' + pattern + '_spot')),
-      block('howToFix', t('p_' + pattern + '_fix')),
+      block('howItWorks', t('p_' + kind + '_how')),
+      block('measured', t('p_' + kind + '_measure', bad.measure), 'is-measure'),
+      block('howToSpot', t('p_' + kind + '_spot')),
+      block('howToFix', t('p_' + kind + '_fix')),
+      el('div', { class: 'explain-block' }, [
+        el('h3', { text: t('checklist') }),
+        el('ol', { class: 'checks' }, [1, 2, 3, 4, 5].map(function (n) {
+          return el('li', { class: n === checkNo ? 'is-current' : null, text: t('check' + n) });
+        })),
+      ]),
     );
   }
 
@@ -143,7 +152,7 @@
   }
 
   function range(labelKey, key, min, max, step, suffix, vars) {
-    var params = state.params[state.pattern];
+    var params = state.params[kindOf(state.pattern)];
     var out = el('output', { text: params[key] + (suffix || '') });
     var input = el('input', { type: 'range', min: min, max: max, step: step, value: params[key] });
     input.addEventListener('input', function () {
@@ -155,7 +164,7 @@
   }
 
   function check(labelKey, key, vars) {
-    var params = state.params[state.pattern];
+    var params = state.params[kindOf(state.pattern)];
     var input = el('input', { type: 'checkbox' });
     input.checked = !!params[key];
     input.addEventListener('change', function () { params[key] = input.checked; renderCharts(); });
@@ -163,22 +172,35 @@
   }
 
   function trickControls() {
-    var pattern = state.pattern, d = state.data[pattern];
-    if (pattern === 'dual') return [check('dual_hideRight', 'hideRight')];
-    if (pattern === 'interval') return [check('interval_even', 'even')];
-    if (pattern === 'truncate') {
+    var pattern = state.pattern, kind = kindOf(pattern), d = state.data[kind], out = [];
+    if (Charts.VARIANTS[pattern]) {
+      out.push(el('div', { class: 'field is-stack' }, [
+        el('span', { text: t('variant') }),
+        el('div', { class: 'segmented', role: 'group', 'aria-label': t('variant') }, Charts.VARIANTS[pattern].map(function (v) {
+          return el('button', {
+            class: 'kit-btn', type: 'button', 'aria-pressed': String(v === kind), text: t('v_' + v),
+            onclick: function () { state.variant[pattern] = v; renderAll(); },
+          });
+        })),
+      ]));
+    }
+    if (kind === 'dual') out.push(check('dual_hideRight', 'hideRight'));
+    if (kind === 'interval') out.push(check('interval_even', 'even'));
+    if (kind === 'ratio') out.push(range('ratio_inflate', 'inflate', 0, 40, 1));
+    if (kind === 'bars3d') out.push(range('bars3d_perspective', 'perspective', 0, 120, 5, '%'));
+    if (kind === 'truncate') {
       var min = Math.min.apply(null, d.items.map(function (i) { return i.value; }));
       var max = Math.max(1, Math.floor(min - 0.1));
       state.params.truncate.start = Math.min(state.params.truncate.start, max);
-      return [range('truncate_start', 'start', 0, max, 1)];
+      out.push(range('truncate_start', 'start', 0, max, 1));
     }
-    if (pattern === 'pie3d') {
+    if (kind === 'pie3d') {
       var own = { a: loc(d.items[0].label) };
-      return [range('pie3d_tilt', 'tilt', 0, 75, 1, '°'), range('pie3d_depth', 'depth', 0, 70, 1),
-        check('pie3d_front', 'front', own), check('pie3d_hideValues', 'hideValues')];
+      out.push(range('pie3d_tilt', 'tilt', 0, 75, 1, '°'), range('pie3d_depth', 'depth', 0, 70, 1),
+        check('pie3d_front', 'front', own), check('pie3d_hideValues', 'hideValues'));
     }
-    state.params.category.cut = Math.min(state.params.category.cut, d.items.length - 1);
-    return [range('category_cut', 'cut', 1, d.items.length - 1, 1)];
+    if (kind === 'category') out.push(range('category_merge', 'merge', 0, Math.floor(d.items.length / 2), 1));
+    return out;
   }
 
   function numberCell(get, set) {
@@ -199,8 +221,8 @@
   }
 
   function dataEditor() {
-    var pattern = state.pattern, d = state.data[pattern], head, rows;
-    if (pattern === 'dual') {
+    var kind = kindOf(state.pattern), d = state.data[kind], head, rows;
+    if (kind === 'dual') {
       head = [t('label')].concat(d.series.map(function (s) { return loc(s.name); }));
       rows = d.labels.map(function (label, i) {
         return el('tr', {}, [labelCell(label)].concat(d.series.map(function (s) {
@@ -243,7 +265,7 @@
       return el('button', {
         class: 'pattern', type: 'button', 'aria-pressed': String(state.pattern === id),
         onclick: function () { state.pattern = id; renderAll(); },
-      }, [el('span', { class: 'pattern-no', text: String(i + 1) }), el('span', { text: t('p_' + id) })]);
+      }, [el('span', { class: 'pattern-no', text: String(i + 1) }), el('span', { text: t('n_' + id) })]);
     });
 
     var fontSelect = el('select', {}, Object.keys(FONTS).map(function (key) {
@@ -261,9 +283,9 @@
     ui.good = el('div', { class: 'chart' });
     ui.explain = el('div', { class: 'explain' });
 
-    var titleInput = el('input', { type: 'text', class: 'title-input', value: ready ? titleFor(state.pattern, true) : '' });
+    var titleInput = el('input', { type: 'text', class: 'title-input', value: ready ? titleFor(kindOf(state.pattern), true) : '' });
     titleInput.addEventListener('input', function () {
-      state.titles[state.pattern + '.' + state.lang] = titleInput.value; renderCharts();
+      state.titles[kindOf(state.pattern) + '.' + state.lang] = titleInput.value; renderCharts();
     });
 
     var main = ready ? [
@@ -286,9 +308,10 @@
           el('button', {
             class: 'kit-btn', type: 'button', text: t('resetData'),
             onclick: function () {
-              state.data[state.pattern] = clone(state.samples[state.pattern]);
-              state.params[state.pattern] = clone(DEFAULT_PARAMS[state.pattern]);
-              delete state.titles[state.pattern + '.' + state.lang];
+              var kind = kindOf(state.pattern);
+              state.data[kind] = clone(state.samples[kind]);
+              state.params[kind] = clone(DEFAULT_PARAMS[kind]);
+              delete state.titles[kind + '.' + state.lang];
               renderAll();
             },
           }),
@@ -323,7 +346,7 @@
         ]),
         el('main', { class: 'main' }, main),
       ]),
-      el('footer', { class: 'kit-foot' }, [el('div', { text: note }), el('div', { text: t('capture') })]),
+      el('footer', { class: 'kit-foot' }, [el('div', { text: t('credit') }), el('div', { text: note }), el('div', { text: t('capture') })]),
     ]));
     renderCharts();
   }

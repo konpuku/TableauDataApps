@@ -47,7 +47,6 @@
       total: '合計',
 
       // --- 手口 1: 二軸 ---
-      p_dual: '誤認を誘う二軸グラフ',
       p_dual_title: '大手に肩を並べる成長!',
       p_dual_honest: '売上の推移(2 社を同じ軸で)',
       p_dual_how: '規模の違う 2 つの系列を、左右で別々の目盛りに載せています。右の軸は自社だけに合わせて引き伸ばしてあるので、桁が 2 つ違う売上が同じ高さに見えます。',
@@ -60,7 +59,6 @@
       dual_unit: '売上(億円)',
 
       // --- 手口 2: 0 から始まらない棒 ---
-      p_truncate: '0 から始まらない棒グラフ',
       p_truncate_title: '顧客満足度 圧倒的 No.1!',
       p_truncate_honest: '顧客満足度の比較',
       p_truncate_how: '縦軸を 0 ではなく途中の値から始めています。棒グラフは長さで量を伝えるので、根元を切ると小さな差が何倍にも見えます。',
@@ -71,7 +69,6 @@
       truncate_unit: '満足度(%)',
 
       // --- 手口 3: 間隔 ---
-      p_interval: '間隔が歪められたグラフ',
       p_interval_title: '創業以来、着実に成長',
       p_interval_honest: '会員数の推移',
       p_interval_how: '横軸の目盛りを等間隔に並べていますが、実際の年の間隔はばらばらです。10 年分と 1 年分が同じ幅なので、最近の急な伸びが「ずっと一定の成長」に見えます。',
@@ -82,7 +79,6 @@
       interval_unit: '会員数(万人)',
 
       // --- 手口 4: 3D ---
-      p_pie3d: '3D で手前を大きく見せるグラフ',
       p_pie3d_title: '自社シェア、存在感 No.1',
       p_pie3d_honest: '市場シェア',
       p_pie3d_how: '円グラフを奥に倒し、厚みを付けています。手前に来た項目は「上の面」に加えて「側面」も見えるので、実際の割合より大きく見えます。数値も書いていません。',
@@ -95,17 +91,52 @@
       pie3d_hideValues: '数値を表示しない',
 
       // --- 手口 5: 分類 ---
-      p_category: '項目の分類が恣意的なグラフ',
-      p_category_title: '利用者の {pct}% が「満足」と回答!',
-      p_category_honest: '満足度アンケートの回答',
-      p_category_how: '5 段階の回答を 2 つにまとめ直しています。「どちらともいえない」をどちら側に入れるかは作り手が決めているので、結論を好きな方向に動かせます。',
-      p_category_spot: '「その他」や大きなくくりを見たら、何と何を合算したのかを確かめる。元の選択肢や区切りが示されていなければ疑う。',
-      p_category_fix: '元の選択肢のまま示す。まとめるなら、区切りの基準を明記し、中立の回答はどちらにも入れない。',
-      p_category_measure: '「満足」側にまとめた {n} 項目のうち、はっきり肯定的な回答は {real}%。残りの {padded}% は中立などの回答です。',
-      category_cut: '「満足」に含める項目の数',
-      category_pos: '満足',
-      category_neg: '不満',
-      category_unit: '回答の割合(%)',
+      p_category_title: '全世代から支持される商品 A',
+      p_category_honest: '年齢層別の購買者数(10 歳刻み)',
+      p_category_how: '年齢の区切り幅をそろえていません。若い層だけ 20 歳分をまとめ、ほかは 10 歳刻みのまま並べています。まとめた棒は 2 つ分の合計なので、実際より人気があるように見えます。',
+      p_category_spot: '項目の区切り(年齢の幅、金額の幅、商品のくくり)がそろっているかを最初に確かめる。自社だけ合算、他社だけ細分化、という比べ方にも注意。',
+      p_category_fix: '同じ幅・同じ粒度で区切る。まとめる必要があるなら、すべての項目を同じ基準でまとめる。',
+      p_category_measure: '「{g}」の {sum} 人は 2 つの年代の合計です。10 歳分に直すと {avg} 人。単独の年代で最も多いのは {top} の {topv} 人。',
+      category_merge: '20 歳分にまとめる組の数',
+      category_unit: '購買者数(人)',
+
+      // --- 手口 3(円): 比率 ---
+      p_ratio_title: '商品 B も主力に成長',
+      p_ratio_honest: 'A 社の売上構成比',
+      p_ratio_how: '円グラフの扇形を、数値と合わない大きさで描いています。ラベルの数値は正しいままなので気づきにくく、面積の印象だけが変わります。',
+      p_ratio_spot: 'ラベルの数値と扇形の大きさを見比べる。25% なら 4 分の 1、50% なら半円になっているはず。',
+      p_ratio_fix: '扇形の角度は必ず数値から計算する。手で描いた図や、後から形を整えた図は使わない。',
+      p_ratio_measure: '{a} は {actual}% なのに、{drawn}% 分の面積で描かれています(約 {times} 倍)。',
+      ratio_inflate: '扇形を広げる量(ポイント)',
+
+      // --- 手口 4(棒): 遠近感 ---
+      p_bars3d_title: '採用人数、3 年連続で拡大中',
+      p_bars3d_honest: '過去 3 年間の採用実績',
+      p_bars3d_how: '棒を奥から手前へ並べ、手前ほど大きく描いています。値はほとんど同じでも、遠近感のせいで年々増えているように見えます。',
+      p_bars3d_spot: '立体のグラフは、形ではなく数値を読む。平面で描けるデータをわざわざ 3D にしているなら、意図を疑う。',
+      p_bars3d_fix: '3D にしない。同じ基線・同じ幅の平面の棒で描く。',
+      p_bars3d_measure: '{a} の棒は {b} の {visual} 倍の高さ(面積では約 {area} 倍)で描かれています。実際の値は {actual} 倍。',
+      bars3d_perspective: '遠近感の強さ',
+      bars3d_unit: '採用人数(人)',
+
+      // --- 手口の名前と、描き方の切り替え ---
+      n_dual: '誤認を誘う二軸グラフ',
+      n_truncate: '0 から始まらない棒グラフ',
+      n_interval: '比率・間隔が歪められているグラフ',
+      n_threeD: '3D にすることで手前を大きく見せているグラフ',
+      n_category: '項目の分類が恣意的なグラフ',
+      variant: 'グラフの種類',
+      v_ratio: '円グラフ(比率)',
+      v_interval: '折れ線(間隔)',
+      v_bars3d: '棒グラフ',
+      v_pie3d: '円グラフ',
+      checklist: '見るときの 5 つのチェック',
+      check1: '複数のグラフがあるとき、単位はそろっているか',
+      check2: '棒グラフの起点は 0 になっているか',
+      check3: '面積の比率や軸の間隔は歪められていないか',
+      check4: '数値と図形から受ける印象に乖離はないか',
+      check5: '項目は公平な分類で設定されているか',
+      credit: '手口の分類とチェック項目は「データのじかん」の記事「え、待って、それ詐欺グラフかも！？」に基づきます。サンプルの数値は架空のものです。',
     },
 
     en: {
@@ -148,7 +179,6 @@
       capture: 'To keep an image, use your operating system\'s screenshot tool (a data app cannot save files or write to the clipboard).',
       total: 'Total',
 
-      p_dual: 'Misleading dual axis',
       p_dual_title: 'Growing shoulder to shoulder with the leader!',
       p_dual_honest: 'Revenue over time (both on one axis)',
       p_dual_how: 'Two series of very different size sit on separate left and right scales. The right axis is stretched to fit our company alone, so revenues two orders of magnitude apart appear at the same height.',
@@ -160,7 +190,6 @@
       dual_rightAxis: 'Right axis',
       dual_unit: 'Revenue (¥100M)',
 
-      p_truncate: 'Bars that do not start at zero',
       p_truncate_title: 'No. 1 in customer satisfaction — by far!',
       p_truncate_honest: 'Customer satisfaction compared',
       p_truncate_how: 'The vertical axis starts partway up instead of at zero. Bars communicate quantity by length, so cutting off the base turns a small gap into a multiple.',
@@ -170,7 +199,6 @@
       truncate_start: 'Axis starts at',
       truncate_unit: 'Satisfaction (%)',
 
-      p_interval: 'Distorted intervals',
       p_interval_title: 'Steady growth since day one',
       p_interval_honest: 'Members over time',
       p_interval_how: 'The ticks are spaced evenly, but the years between them are not. Ten years and one year get the same width, so a recent surge reads as steady growth all along.',
@@ -180,7 +208,6 @@
       interval_even: 'Space the ticks evenly',
       interval_unit: 'Members (10k)',
 
-      p_pie3d: '3D that inflates the front',
       p_pie3d_title: 'Our share: the biggest presence',
       p_pie3d_honest: 'Market share',
       p_pie3d_how: 'The pie is tilted back and given thickness. A slice at the front shows its side wall as well as its top, so it looks bigger than its real share. The numbers are left off.',
@@ -192,17 +219,49 @@
       pie3d_front: 'Put "{a}" at the front',
       pie3d_hideValues: 'Leave the values off',
 
-      p_category: 'Arbitrary grouping',
-      p_category_title: '{pct}% of users say they are "satisfied"!',
-      p_category_honest: 'Satisfaction survey responses',
-      p_category_how: 'Five answer choices are regrouped into two. Whoever draws the chart decides which side "Neither" goes on, so the conclusion can be pushed either way.',
-      p_category_spot: 'When you see "Other" or a broad bucket, ask what was added together. If the original choices or cut-offs are not shown, be suspicious.',
-      p_category_fix: 'Show the original choices. If you must group, state the rule and keep neutral answers out of both sides.',
-      p_category_measure: 'Of the {n} items grouped as "satisfied", clearly positive answers make up {real}%. The other {padded}% are neutral or weaker answers.',
-      category_cut: 'Items counted as "satisfied"',
-      category_pos: 'Satisfied',
-      category_neg: 'Dissatisfied',
-      category_unit: 'Share of responses (%)',
+      p_category_title: 'Product A: loved by every generation',
+      p_category_honest: 'Buyers by age group (10-year bands)',
+      p_category_how: 'The age bands are not the same width. Only the younger groups are merged into 20-year bands, while the rest stay in 10-year bands. A merged bar is the sum of two, so it looks more popular than it is.',
+      p_category_spot: 'First check that the categories are cut the same way (age width, price width, product grouping). Watch for "ours combined, theirs split up" comparisons too.',
+      p_category_fix: 'Use the same width and granularity for every category. If you must merge, merge all of them by the same rule.',
+      p_category_measure: 'The {sum} buyers in "{g}" are two age bands added together. Per 10-year band that is {avg}. The largest single band is {top} with {topv}.',
+      category_merge: 'Pairs merged into 20-year bands',
+      category_unit: 'Buyers',
+
+      p_ratio_title: 'Product B grows into a core product',
+      p_ratio_honest: 'Company A revenue mix',
+      p_ratio_how: 'The pie slices are drawn at sizes that do not match the numbers. The labels stay correct, so it is hard to notice — only the impression of area changes.',
+      p_ratio_spot: 'Compare each label with the size of its slice. 25% should be a quarter, 50% a half circle.',
+      p_ratio_fix: 'Always compute slice angles from the values. Do not use hand-drawn or reshaped charts.',
+      p_ratio_measure: '{a} is {actual}%, but it is drawn with {drawn}% of the area (about {times}×).',
+      ratio_inflate: 'Slice widened by (points)',
+
+      p_bars3d_title: 'Hiring up three years running',
+      p_bars3d_honest: 'Hires over the past three years',
+      p_bars3d_how: 'The bars are lined up from back to front, and the nearer ones are drawn larger. The values are almost the same, but perspective makes them look like they grow every year.',
+      p_bars3d_spot: 'On a 3D chart, read the numbers, not the shapes. If flat data was drawn in 3D on purpose, question why.',
+      p_bars3d_fix: 'Do not use 3D. Draw flat bars with the same baseline and width.',
+      p_bars3d_measure: 'The bar for {a} is drawn {visual}× as tall as {b} (about {area}× the area). The real values differ by {actual}×.',
+      bars3d_perspective: 'Strength of perspective',
+      bars3d_unit: 'Hires',
+
+      n_dual: 'Misleading dual axis',
+      n_truncate: 'Bars that do not start at zero',
+      n_interval: 'Distorted proportions and intervals',
+      n_threeD: '3D that makes the front look bigger',
+      n_category: 'Arbitrary categories',
+      variant: 'Chart type',
+      v_ratio: 'Pie (proportion)',
+      v_interval: 'Line (interval)',
+      v_bars3d: 'Bars',
+      v_pie3d: 'Pie',
+      checklist: 'Five checks when reading a chart',
+      check1: 'With more than one chart or axis, are the units the same?',
+      check2: 'Do the bars start at zero?',
+      check3: 'Are area proportions and axis intervals undistorted?',
+      check4: 'Do the numbers match the impression the shapes give?',
+      check5: 'Are the categories set by a fair classification?',
+      credit: 'The patterns and checks follow the article "Wait, is that a misleading chart?" by Data no Jikan (WingArc1st). The sample numbers are fictional.',
     },
   };
 })();

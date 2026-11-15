@@ -26,8 +26,17 @@ pie3d,シェア,Share,自社,Our company,1,23
 pie3d,シェア,Share,A社,Company A,2,30
 pie3d,シェア,Share,B社,Company B,3,27
 pie3d,シェア,Share,その他,Others,4,20
-category,回答,Responses,とても満足,Very satisfied,1,14
-category,回答,Responses,満足,Satisfied,2,21
-category,回答,Responses,どちらともいえない,Neither,3,33
-category,回答,Responses,不満,Dissatisfied,4,19
-category,回答,Responses,とても不満,Very dissatisfied,5,13
+ratio,構成比,Mix,商品A,Product A,1,40
+ratio,構成比,Mix,商品B,Product B,2,20
+ratio,構成比,Mix,商品C,Product C,3,15
+ratio,構成比,Mix,商品D,Product D,4,14
+ratio,構成比,Mix,商品E,Product E,5,11
+bars3d,採用人数,Hires,2022,2022,2022,118
+bars3d,採用人数,Hires,2023,2023,2023,121
+bars3d,採用人数,Hires,2024,2024,2024,119
+category,購買者数,Buyers,10代,Teens,10,48
+category,購買者数,Buyers,20代,20s,20,66
+category,購買者数,Buyers,30代,30s,30,59
+category,購買者数,Buyers,40代,40s,40,73
+category,購買者数,Buyers,50代,50s,50,124
+category,購買者数,Buyers,60代,60s,60,102

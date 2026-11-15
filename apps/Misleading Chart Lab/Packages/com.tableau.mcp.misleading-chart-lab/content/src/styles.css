@@ -82,3 +82,9 @@
 @media (max-width: 760px) {
   .charts, .lower { grid-template-columns: 1fr; }
 }
+
+.segmented { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.checks { margin: 0; padding-left: 1.4em; color: var(--muted); }
+.checks li { padding: 1px 0; }
+.checks li.is-current { color: var(--ink); font-weight: 600; }

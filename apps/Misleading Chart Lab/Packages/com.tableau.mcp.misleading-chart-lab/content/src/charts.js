@@ -1,7 +1,7 @@
 // ============================================================================
-// charts.js — 5 つの手口それぞれについて、「誤解を招く版」と「正直な版」を SVG で描く。
+// charts.js — 5 つの手口(描き方は 7 種類)それぞれについて、「誤解を招く版」と「正直な版」を SVG で描く。
 //
-//   var out = Charts.render(patternId, { data, params, deceptive, style, title, t });
+//   var out = Charts.render(kind, { data, params, deceptive, style, title, t });
 //   out.svg      … 描いた <svg>
 //   out.measure  … ずれの大きさを説明するための数値(app.js が文言に差し込む)
 //
@@ -289,36 +289,136 @@
     } };
   }
 
-  // ---- 手口 5: 恣意的な分類 --------------------------------------------------
+  // ---- 手口 3(円): 面積の比率を歪める ---------------------------------------
+  // ラベルの数値は正しいまま、2 番目の項目だけ扇形を広げて描く。
+  function ratio(o) {
+    var items = o.data.items, s = o.style;
+    var p = frame(o, { left: 20, right: 20, bottom: 24 });
+    var total = items.reduce(function (a, b) { return a + b.value; }, 0) || 1;
+    var cx = W / 2, cy = p.y + p.h / 2, R = Math.min(p.w / 2 - 80, p.h / 2 - 4);
+    var target = Math.min(1, items.length - 1);
+    var real = items.map(function (i) { return i.value / total; });
+    var drawn = real.slice();
+    if (o.deceptive) {
+      // 広げた分は、ほかの項目から割合に応じて削る
+      var want = Math.min(0.9, real[target] + o.params.inflate / 100);
+      var rest = 1 - real[target] || 1;
+      drawn = real.map(function (r, i) { return i === target ? want : r * ((1 - want) / rest); });
+    }
+    var at = function (a, r) { return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+    var a0 = -Math.PI / 2;
+    items.forEach(function (item, i) {
+      var a1 = a0 + drawn[i] * TAU, mid = (a0 + a1) / 2, cos = Math.cos(mid);
+      p.svg.appendChild(el('path', {
+        d: 'M' + cx + ',' + cy + 'L' + at(a0, R) + 'A' + R + ',' + R + ' 0 ' + (a1 - a0 > Math.PI ? 1 : 0) + ' 1 ' + at(a1, R) + 'Z',
+        fill: i === target ? s.accent : s.main,
+        'fill-opacity': i === target ? 1 : Math.max(0.25, 0.9 - (i > target ? i - 1 : i) * 0.2),
+        stroke: s.bg, 'stroke-width': 2,
+      }));
+      var pos = at(mid, R + 12);
+      p.svg.appendChild(el('text', {
+        x: pos[0], y: pos[1] + p.tick * 0.35, 'text-anchor': Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end',
+        fill: s.ink, 'font-size': p.tick + 1, 'font-weight': i === target ? 700 : 400,
+        text: item.label + ' ' + fmt(real[i] * 100, 1) + '%',
+      }));
+      a0 = a1;
+    });
+    return { svg: p.svg, measure: {
+      a: items[target].label, actual: fmt(real[target] * 100, 1), drawn: fmt(drawn[target] * 100, 1),
+      times: fmt(drawn[target] / (real[target] || 1), 2),
+    } };
+  }
+
+  // ---- 手口 4(棒): 遠近感で手前を大きく見せる -------------------------------
+  // 奥から手前へ並べ、手前ほど拡大する。値がほぼ同じでも「増え続けている」ように見える。
+  function bars3d(o) {
+    var items = o.data.items, s = o.style, n = items.length;
+    if (!o.deceptive) {
+      var q = frame(o);
+      var top = niceMax(Math.max.apply(null, items.map(function (i) { return i.value; })));
+      var scale = function (v) { return q.y + q.h - (v / top) * q.h; };
+      yAxis(q, o, scale, ticks(0, top, 5), 'left', o.t('bars3d_unit'));
+      baseline(q, o);
+      columns(q, o, items.map(function (item, i) {
+        return { label: item.label, value: item.value, color: i === n - 1 ? s.accent : s.main, opacity: i === n - 1 ? 1 : 0.75 };
+      }), scale);
+      return { svg: q.svg, measure: {} };
+    }
+
+    var p = frame(o, { left: 30, right: 30, bottom: 20 });
+    var max = Math.max.apply(null, items.map(function (i) { return i.value; })) || 1;
+    var k = o.params.perspective / 100;                 // 0 = 遠近なし、1 = 手前が 2 倍
+    var factor = function (i) { return 1 + k * (n === 1 ? 0 : i / (n - 1)); };
+    var frontScale = factor(n - 1);
+    var baseH = (p.h - 30) / frontScale * 0.92, baseW = Math.min(120, (p.w * 0.5) / frontScale);
+    var stepX = (p.w - baseW * frontScale - 30) / Math.max(1, n - 1), stepY = 26 / Math.max(1, n - 1);
+    var heights = [];
+    items.forEach(function (item, i) {
+      var f = factor(i), w = baseW * f, h = (item.value / max) * baseH * f, side = 14 * f;
+      var x = p.x + 30 + i * stepX, bottom = p.y + p.h - 26 + i * stepY, y = bottom - h;
+      var color = i === n - 1 ? s.accent : s.main, opacity = i === n - 1 ? 1 : 0.6 + 0.2 * (i / Math.max(1, n - 1));
+      heights.push(h);
+      // 側面(左)と上面
+      var sideD = 'M' + x + ',' + y + 'L' + (x - side) + ',' + (y - side * 0.5) + 'L' + (x - side) + ',' + (bottom - side * 0.5) + 'L' + x + ',' + bottom + 'Z';
+      var topD = 'M' + x + ',' + y + 'L' + (x - side) + ',' + (y - side * 0.5) + 'L' + (x + w - side) + ',' + (y - side * 0.5) + 'L' + (x + w) + ',' + y + 'Z';
+      [sideD, topD].forEach(function (d, idx) {
+        p.svg.appendChild(el('path', { d: d, fill: s.bg }));
+        p.svg.appendChild(el('path', { d: d, fill: color, 'fill-opacity': opacity }));
+        p.svg.appendChild(el('path', { d: d, fill: '#000', 'fill-opacity': idx === 0 ? 0.3 : 0.12 }));
+      });
+      p.svg.appendChild(el('rect', { x: x, y: y, width: w, height: h, fill: s.bg }));
+      p.svg.appendChild(el('rect', { x: x, y: y, width: w, height: h, fill: color, 'fill-opacity': opacity, stroke: s.bg, 'stroke-width': 1 }));
+      p.svg.appendChild(el('text', {
+        x: x + w / 2, y: y + h * 0.42, 'text-anchor': 'middle', fill: '#fff', 'font-weight': 700,
+        'font-size': (p.tick + 5) * f, text: fmt(item.value),
+      }));
+      p.svg.appendChild(el('text', {
+        x: x + w / 2, y: bottom - 10 * f, 'text-anchor': 'middle', fill: '#fff', 'font-size': (p.tick + 1) * f, text: item.label,
+      }));
+    });
+    return { svg: p.svg, measure: {
+      a: items[n - 1].label, b: items[0].label,
+      visual: fmt(heights[n - 1] / (heights[0] || 1), 2), actual: fmt(items[n - 1].value / (items[0].value || 1), 2),
+      area: fmt(Math.pow(frontScale, 2) * (items[n - 1].value / (items[0].value || 1)), 1),
+    } };
+  }
+
+  // ---- 手口 5: 恣意的な分類(区切り幅をそろえない) ---------------------------
+  // 若い側から 2 つずつ年代をまとめ、残りは 1 つずつのまま並べる。
   function category(o) {
     var items = o.data.items, s = o.style;
     var p = frame(o);
-    var total = items.reduce(function (a, b) { return a + b.value; }, 0) || 1;
-    var pct = function (v) { return (v / total) * 100; };
-    var cut = Math.max(1, Math.min(items.length - 1, o.params.cut));
-    var sum = function (list) { return list.reduce(function (a, b) { return a + b.value; }, 0); };
-    var pos = pct(sum(items.slice(0, cut))), neg = 100 - pos;
-
-    var bars = o.deceptive
-      ? [{ label: o.t('category_pos'), value: +pos.toFixed(1), color: s.accent },
-         { label: o.t('category_neg'), value: +neg.toFixed(1), color: s.main, opacity: 0.55 }]
-      : items.map(function (item) { return { label: item.label, value: +pct(item.value).toFixed(1), color: s.main, opacity: 0.85 }; });
-    var max = niceMax(Math.max.apply(null, bars.map(function (b) { return b.value; })));
+    var merge = o.deceptive ? Math.max(0, Math.min(Math.floor(items.length / 2), o.params.merge)) : 0;
+    var bars = [];
+    for (var g = 0; g < merge; g++) {
+      var a = items[g * 2], b = items[g * 2 + 1];
+      bars.push({ label: a.label + '〜' + b.label, value: a.value + b.value, color: s.accent, merged: true });
+    }
+    items.slice(merge * 2).forEach(function (item) {
+      bars.push({ label: item.label, value: item.value, color: s.main, opacity: 0.8 });
+    });
+    var max = niceMax(Math.max.apply(null, bars.map(function (bar) { return bar.value; })));
     var scale = function (v) { return p.y + p.h - (v / max) * p.h; };
 
     yAxis(p, o, scale, ticks(0, max, 5), 'left', o.t('category_unit'));
     baseline(p, o);
-    columns(p, o, bars, scale, '%');
+    columns(p, o, bars, scale);
 
-    // 「はっきり肯定的」= 先頭 2 項目(とても満足・満足)。それ以外は水増し分として数える。
-    var real = pct(sum(items.slice(0, Math.min(cut, 2))));
-    return { svg: p.svg, measure: { n: cut, pct: fmt(pos, 0), real: fmt(real, 0), padded: fmt(pos - real, 0) } };
+    var merged = bars.filter(function (bar) { return bar.merged; });
+    var biggest = merged.reduce(function (x, y) { return y.value > x.value ? y : x; }, merged[0] || { label: '', value: 0 });
+    var single = items.reduce(function (x, y) { return y.value > x.value ? y : x; });
+    return { svg: p.svg, measure: {
+      g: biggest.label, sum: fmt(biggest.value), avg: fmt(biggest.value / 2), top: single.label, topv: fmt(single.value),
+    } };
   }
 
-  var RENDERERS = { dual: dual, truncate: truncate, interval: interval, pie3d: pie3d, category: category };
+  var RENDERERS = { dual: dual, truncate: truncate, interval: interval, ratio: ratio, bars3d: bars3d, pie3d: pie3d, category: category };
 
   window.Charts = {
-    ORDER: ['dual', 'truncate', 'interval', 'pie3d', 'category'],
-    render: function (pattern, options) { return RENDERERS[pattern](options); },
+    // 画面に並べる 5 つの手口。手口 3 と 4 は記事の例に合わせて 2 種類の描き方(variants)を持つ。
+    ORDER: ['dual', 'truncate', 'interval', 'threeD', 'category'],
+    VARIANTS: { interval: ['ratio', 'interval'], threeD: ['bars3d', 'pie3d'] },
+    DATASETS: ['dual', 'truncate', 'interval', 'ratio', 'bars3d', 'pie3d', 'category'],
+    render: function (kind, options) { return RENDERERS[kind](options); },
   };
 })();

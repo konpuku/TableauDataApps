@@ -72,7 +72,7 @@ sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox
 | Extensions API の `settings` | 可(有無のみ確認) | 状態を持ちたいときの唯一の候補。保存の動作は未確認 |
 | ポップアップ(`window.open`) | 可 | `sandbox` に `allow-popups` がある。サイト設定でポップアップを許可していない場合は未確認 |
 | クリップボードへの書き込み | 不可 | `NotAllowedError`: permissions policy でブロック。「コピー」ボタンは作れないので、選択できるテキスト欄を出す |
-| ファイルのダウンロード(Blob + `a[download]`) | 未確認 | クリックは実行できた。実際に保存されたかは未確認 |
+| ファイルのダウンロード(Blob + `a[download]`) | 不可 | クリックは例外なく実行されるが、ファイルは保存されない(`sandbox` に `allow-downloads` が無い)。書き出しは「選択できるテキスト欄」で代替する |
 
 **設計への影響**
 
@@ -177,7 +177,8 @@ sandbox allow-scripts allow-popups allow-popups-to-escape-sandbox
 - 同梱 CSV(抽出でないファイル接続)に対して `queryAsync` が通るか — 同上
 - 代替経路(従来 API)がパブリッシュ済みデータソースでも使えるか、行レベルセキュリティが効くか
 - HR Dashboard の `performance_rating` がディメンション / メジャーどちらで返るか(アプリは両対応にしてある)
-- ファイルのダウンロード、`settings` の保存
+- `settings` の保存
+- 外部オリジンを許可したときの挙動(地図タイルなど。Worker が使えないため WebGL のベクター地図ライブラリは動かない見込み)
 - REST ブリッジで許可されていないパスを呼んだときの応答(検証サイトは試した呼び出しがすべてブリッジを通過した)
 - 権限の無いユーザーで開いたときの見え方
 - 埋め込み(Embedding API)・モバイル・Tableau Desktop での表示
